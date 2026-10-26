@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Repair Verdict — Repair or Replace?</title>
+<meta name="description" content="Repair-or-replace math for landlords and homeowners: annualized cost, the 50% rule, and the exact break-even repair price.">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#10141A">
+<link rel="icon" href="icons/icon-32.png"><link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+:root{--bg:#10141A;--surface:#171D26;--surface2:#1E2632;--text:#EEF1F4;--muted:#A8B0BA;--accent:#C0A060;--accent2:#3A4A5C;--line:#2E3A48;--bad:#D97A6A;--good:#8FC49A;--warn:#E0B96A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman',serif;line-height:1.5}
+.wrap{max-width:1060px;margin:0 auto;padding:20px 16px 56px}
+.eyebrow{letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-size:12px;font-family:Arial,sans-serif;font-weight:700}
+h1{font-size:clamp(36px,6vw,62px);line-height:.95;margin:10px 0 12px;font-weight:700}
+h2{font-size:24px;margin:0 0 12px;border-bottom:2px solid var(--accent);padding-bottom:8px}
+h3{margin:0 0 8px;font-size:18px}
+.sub{color:var(--muted);font-size:18px;max-width:760px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:20px;box-shadow:0 0 0 1px #0B0E12}
+.hero{border-top:4px solid var(--accent);background:linear-gradient(180deg,#1B2330,#171D26);padding:28px 22px;margin-bottom:16px;border-radius:2px;border-left:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+label{display:block;font-family:Arial,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+input,select{width:100%;padding:11px 12px;background:#0D1117;color:var(--text);border:1px solid var(--line);border-radius:2px;font-size:17px;font-family:Arial,sans-serif;font-variant-numeric:tabular-nums}
+input[type=range]{padding:0;accent-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:520px){.row{grid-template-columns:1fr}}
+.btn{background:var(--accent);color:#10141A;border:0;padding:13px 18px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:Arial,sans-serif;cursor:pointer;border-radius:2px;width:100%;margin-top:18px}
+.btn2{background:var(--accent2);color:#EEF1F4;border:1px solid var(--line);padding:11px 14px;font-weight:700;font-family:Arial,sans-serif;cursor:pointer;border-radius:2px;width:100%;margin-top:10px}
+.big{font-size:clamp(38px,6vw,64px);color:var(--accent);line-height:1;font-variant-numeric:tabular-nums;font-weight:700}
+.seal{display:inline-block;padding:10px 16px;border:2px solid var(--accent);color:var(--accent);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-family:Arial,sans-serif;margin:8px 0}
+.metric{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.metric b{text-align:right}.muted{color:var(--muted)} .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-family:Arial,sans-serif;font-size:14px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--accent);text-transform:uppercase;font-size:11px;letter-spacing:.08em}
+.note{font-size:14px;color:var(--muted)} .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{background:#0D1117;border:1px solid var(--line);color:var(--text);padding:8px 10px;cursor:pointer;border-radius:2px;font-family:Arial,sans-serif;font-size:13px}.chip:hover{border-color:var(--accent);color:var(--accent)}
+.saved{font-family:Arial,sans-serif;font-size:14px}.saved div{padding:10px;border:1px solid var(--line);margin-top:8px;display:flex;justify-content:space-between;gap:10px}
+a{color:var(--accent)} footer{color:var(--muted);font-size:13px;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+.rangeval{color:var(--accent);font-family:Arial,sans-serif;font-size:13px}
+</style></head><body><div class="wrap">
+<header class="hero"><div class="eyebrow">Slate &amp; Sovereign · A Daily Tool</div><h1>The Repair Verdict</h1>
+<p class="sub">A contractor hands you a repair quote and smiles. Before you pay it — or pay five times more to replace the thing — run the honest math: cost per year, the 50% rule, and the exact repair price where fixing it stops making sense.</p></header>
+
+<div class="grid">
+<section class="card"><h2>The Machine</h2>
+<label>What is it?</label><div class="presets" id="presets"></div>
+<label>Custom name</label><input id="name" value="Central AC">
+<div class="row"><div><label>Age (years)</label><input id="age" type="number" value="11" min="0" step="0.5"></div>
+<div><label>Expected total life (years)</label><input id="life" type="number" value="15" min="1"></div></div>
+<div class="row"><div><label>Repair quote ($)</label><input id="repair" type="number" value="1450" min="0"></div>
+<div><label>Replacement cost, installed ($)</label><input id="replace" type="number" value="6800" min="1"></div></div>
+<div class="row"><div><label>Times repaired before</label><input id="prior" type="number" value="1" min="0" max="20"></div>
+<div><label>Old unit's yearly running cost ($)</label><input id="energyOld" type="number" value="620" min="0"></div></div>
+<label>New unit saves on running cost: <span class="rangeval" id="saveVal">25%</span></label>
+<input id="savePct" type="range" min="0" max="60" value="25">
+<label>Years this repair realistically buys: <span class="rangeval" id="extVal">3 years</span></label>
+<input id="ext" type="range" min="1" max="10" value="3" step="0.5">
+<label>If it dies outright, emergency cost / downtime ($)</label><input id="downtime" type="number" value="400" min="0">
+<p class="note">Downtime is real money for landlords: emergency call-out premiums, a tenant hotel night, a rent credit. Homeowners: a weekend in a hotel or a burst pipe's mess. Put a number on it — or leave it at zero and the math still works.</p>
+<button class="btn" id="calc">Deliver the verdict</button>
+<button class="btn2" id="saveBtn">Save this scenario</button>
+<button class="btn2" id="copyBtn">Copy summary</button>
+</section>
+
+<section class="card"><h2>The Verdict</h2><div id="out"></div></section>
+</div>
+
+<div class="grid" style="margin-top:16px">
+<section class="card"><h2>Sensitivity — What If the Quote Moves?</h2><div id="sens"></div>
+<p class="note">Quotes move after the unit is opened up. This table shows where your verdict flips — know your walk-away number before the van is in the driveway.</p></section>
+<section class="card"><h2>Saved Scenarios</h2><div id="saved" class="saved"><p class="muted">Nothing saved yet. Saved scenarios live only in this browser.</p></div>
+<h3 style="margin-top:20px">The method, plainly</h3>
+<p class="note"><b style="color:var(--text)">Cost per year beats sticker shock.</b> A $1,450 repair that buys 3 years costs about $483 a year for the fix itself. A $6,800 replacement spread over a 15-year life costs about $453 a year — before its lower running cost. That comparison, not the quote's size, decides it.</p>
+<p class="note"><b style="color:var(--text)">The 50% rule is a guardrail, not gospel.</b> Repair over half of replacement cost on a unit past half its life is usually throwing good money after old metal. Under it, age and running cost still get a vote.</p>
+<p class="note"><b style="color:var(--text)">Old machines tax you quietly.</b> The running-cost gap between an old unit and a new one, multiplied by the years you'll keep paying it, belongs in the repair column — because choosing repair is choosing that tax.</p>
+</section></div>
+
+<footer>Built for landlords, homeowners, and anyone standing in a mechanical room being sold something. Estimates only — lifespans and running costs vary by brand, climate, and maintenance. No data leaves your device.</footer>
+</div>
+<script>
+const PRESETS=[
+ {name:"Central AC",life:15,replace:6800,energy:620,save:25},
+ {name:"Gas furnace",life:18,replace:5200,energy:540,save:20},
+ {name:"Tank water heater",life:10,replace:1900,energy:380,save:15},
+ {name:"Tankless water heater",life:20,replace:3800,energy:300,save:20},
+ {name:"Refrigerator",life:13,replace:2100,energy:110,save:30},
+ {name:"Washer",life:11,replace:1100,energy:70,save:25},
+ {name:"Dryer",life:12,replace:1000,energy:90,save:20},
+ {name:"Dishwasher",life:9,replace:950,energy:60,save:25},
+ {name:"Range / oven",life:15,replace:1600,energy:80,save:15},
+ {name:"Garage door opener",life:12,replace:650,energy:15,save:10},
+ {name:"Heat pump",life:14,replace:7500,energy:680,save:28},
+ {name:"Well pump",life:12,replace:2400,energy:140,save:15}
+];
+const $=id=>document.getElementById(id);
+const fmt=n=>"$"+Math.round(n).toLocaleString();
+const presetsEl=$("presets");
+PRESETS.forEach((p,i)=>{const b=document.createElement("button");b.className="chip";b.textContent=p.name;b.onclick=()=>{ $("name").value=p.name;$("life").value=p.life;$("replace").value=p.replace;$("energyOld").value=p.energy;$("savePct").value=p.save;syncRanges();calc();};presetsEl.appendChild(b);});
+function syncRanges(){$("saveVal").textContent=$("savePct").value+"%";$("extVal").textContent=$("ext").value+" years";}
+["savePct","ext"].forEach(id=>$(id).addEventListener("input",()=>{syncRanges();calc();}));
+function inputs(){return{name:$("name").value||"Unit",age:+$("age").value||0,life:Math.max(1,+$("life").value||1),repair:Math.max(0,+$("repair").value||0),replace:Math.max(1,+$("replace").value||1),prior:Math.max(0,+$("prior").value||0),energyOld:Math.max(0,+$("energyOld").value||0),savePct:+$("savePct").value||0,ext:Math.max(0.5,+$("ext").value||1),downtime:Math.max(0,+$("downtime").value||0)}}
+function analyze(x){
+ const energyNew=x.energyOld*(1-x.savePct/100);
+ const savePerYear=x.energyOld-energyNew;
+ const agePct=x.age/x.life*100;
+ const repairPct=x.repair/x.replace*100;
+ // Failure-risk loading: each prior repair raises the chance the fix does not hold its full extension.
+ const riskLoad=1+Math.min(0.6,x.prior*0.15);
+ const effExt=x.ext/riskLoad;
+ const annualRepair=x.repair/effExt + x.energyOld + (x.downtime>0? (x.downtime*0.25)/effExt:0);
+ const annualReplace=x.replace/x.life + energyNew;
+ const breakEvenRepair=Math.max(0, effExt*(annualReplace - x.energyOld - (x.downtime>0?(x.downtime*0.25)/effExt:0)));
+ const totalRepair=x.repair + x.energyOld*x.ext + x.downtime*0.25;
+ const totalReplaceOverExt=x.replace*(x.ext/x.life) + energyNew*x.ext;
+ let verdict,cls,why;
+ const fiftyRule = repairPct>=50 && agePct>=50;
+ if(fiftyRule || annualRepair>annualReplace*1.05){verdict="REPLACE IT";cls="bad";why="The repair fails the economics. You would pay replacement-grade money, per year, to keep an old machine — and still carry its higher running cost and breakdown risk.";}
+ else if(annualRepair<annualReplace*0.92 && repairPct<50 && agePct<90){verdict="REPAIR IT";cls="good";why="The fix is genuinely cheaper per year than a new unit's cost per year, and the machine is not yet living on borrowed time. Pay the quote, bank the difference.";}
+ else {verdict="FIX IT — ONCE, WITH A CAP";cls="warn";why="It is close. Repair only at or below the break-even price below, get the warranty in writing, and start a replacement reserve today. The next quote is a replacement, no debate.";}
+ return{energyNew,savePerYear,agePct,repairPct,annualRepair,annualReplace,breakEvenRepair,totalRepair,verdict,cls,why,effExt,fiftyRule};
+}
+function calc(){
+ const x=inputs(),a=analyze(x);
+ $("out").innerHTML=`<div class="seal" style="border-color:var(--${a.cls==='good'?'good':a.cls==='bad'?'bad':'warn'});color:var(--${a.cls==='good'?'good':a.cls==='bad'?'bad':'warn'})">${a.verdict}</div>
+ <p>${a.why}</p>
+ <div class="big">${fmt(a.breakEvenRepair)}</div><p class="muted" style="margin-top:4px">Break-even repair price — above this number, replacing wins. Your quote is ${fmt(x.repair)}.</p>
+ <div class="metric"><span>Repair path — cost per year</span><b>${fmt(a.annualRepair)}/yr</b></div>
+ <div class="metric"><span>Replacement — cost per year</span><b>${fmt(a.annualReplace)}/yr</b></div>
+ <div class="metric"><span>Repair as % of replacement</span><b class="${a.repairPct>=50?'bad':'good'}">${a.repairPct.toFixed(0)}%</b></div>
+ <div class="metric"><span>Life already used</span><b>${a.agePct.toFixed(0)}% (${x.age} of ${x.life} yrs)</b></div>
+ <div class="metric"><span>50% rule triggered?</span><b>${a.fiftyRule?'<span class="bad">Yes — repair ≥50% &amp; age ≥50%</span>':'No'}</b></div>
+ <div class="metric"><span>Running-cost saving, new unit</span><b>${fmt(a.savePerYear)}/yr</b></div>
+ <div class="metric"><span>Prior repairs (risk loading)</span><b>${x.prior} — effective extension ${a.effExt.toFixed(1)} yrs</b></div>
+ <div class="metric"><span>Cost of repair path over ${x.ext} yrs</span><b>${fmt(a.totalRepair)}</b></div>`;
+ // sensitivity
+ let rows=[0.5,0.75,1,1.25,1.5].map(m=>{const y={...x,repair:x.repair*m};const r=analyze(y);return `<tr><td>${fmt(y.repair)} (${Math.round(m*100)}%)</td><td>${fmt(r.annualRepair)}/yr</td><td>${r.verdict}</td></tr>`}).join("");
+ $("sens").innerHTML=`<table><tr><th>Repair quote</th><th>Cost / yr</th><th>Verdict</th></tr>${rows}</table>
+ <p class="note" style="margin-top:10px">Replacement benchmark: ${fmt(a.annualReplace)}/yr all-in (unit spread over ${x.life} years + ${fmt(a.energyNew)}/yr running cost).</p>`;
+ return{x,a};
+}
+function summary(){const{x,a}=calc();return `THE REPAIR VERDICT — ${x.name}\nVerdict: ${a.verdict}\nQuote: ${fmt(x.repair)} vs replacement ${fmt(x.replace)} (${a.repairPct.toFixed(0)}%)\nAge: ${x.age}/${x.life} yrs (${a.agePct.toFixed(0)}% of life used)\nRepair cost/yr: ${fmt(a.annualRepair)} · Replacement cost/yr: ${fmt(a.annualReplace)}\nBreak-even repair price: ${fmt(a.breakEvenRepair)}\nRunning-cost saving with new: ${fmt(a.savePerYear)}/yr`;}
+$("calc").onclick=calc;
+$("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(summary());$("copyBtn").textContent="Copied ✓";setTimeout(()=>$("copyBtn").textContent="Copy summary",1500);}catch(e){alert(summary());}};
+$("saveBtn").onclick=()=>{const{x,a}=calc();const list=JSON.parse(localStorage.getItem("repair-verdict")||"[]");list.push({...x,verdict:a.verdict,when:new Date().toLocaleDateString()});localStorage.setItem("repair-verdict",JSON.stringify(list));renderSaved();};
+function renderSaved(){const list=JSON.parse(localStorage.getItem("repair-verdict")||"[]");if(!list.length)return;$("saved").innerHTML=list.map((s,i)=>`<div><span><b>${s.name}</b> — ${s.verdict}<br><span class="muted">${s.when} · quote ${fmt(s.repair)} vs ${fmt(s.replace)}</span></span><button class="chip" onclick="delSaved(${i})">Delete</button></div>`).join("");}
+window.delSaved=i=>{const list=JSON.parse(localStorage.getItem("repair-verdict")||"[]");list.splice(i,1);localStorage.setItem("repair-verdict",JSON.stringify(list));renderSaved();if(!list.length)$("saved").innerHTML='<p class="muted">Nothing saved yet.</p>';};
+document.querySelectorAll("input").forEach(el=>el.addEventListener("input",calc));
+syncRanges();calc();renderSaved();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script></body></html>
